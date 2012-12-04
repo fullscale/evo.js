@@ -1,0 +1,30 @@
+{
+    "name": "evo.js",
+    "description": "Evo modules",
+    "version": "1.0.0",
+    "homepage": "https://www.fullscale.co/evo",
+    "keywords": ["elasticsearch", "search", "elasticjs", "elastic", "elastic search", "angularjs", "d3"],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/fullscale/evo.js.git"
+    },
+    "bugs": {
+        "url": "https://www.fullscale.co/evo/issues"
+    },
+    "licenses": [
+        {
+            "type": "",
+            "url": ""
+        }
+    ],
+    "author": {
+        "name": "FullScale Labs, LLC",
+        "url": "https://github.com/fullscale/evo.js/blob/master/AUTHORS.txt"
+    },
+    "scripts": {
+        "test": "grunt test"
+    },
+    "devDependencies": {
+        "grunt": "~0.3.17"
+    }
+}
