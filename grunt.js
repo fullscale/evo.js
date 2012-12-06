@@ -17,7 +17,9 @@ module.exports = function (grunt) {
         src: [
           '<banner:meta.banner>',
           'lib/d3.v2.min.js',
+          'lib/elastic.min.js',
           'src/evo.modules.js',
+          'src/services/modules/**/*.js',
           'src/graphing/modules/**/*.js'
         ],
         dest: 'dist/evo.js'
@@ -28,6 +30,13 @@ module.exports = function (grunt) {
           'src/evo.modules.js'
         ],
         dest: 'dist/evo.modules.js'
+      },
+      ejs: {
+        src: [
+          '<banner:meta.banner>',
+          'src/services/modules/ejs/ejs.js'
+        ],
+        dest: 'dist/ejs.min.js'
       },
       pie: {
         src: [
@@ -63,8 +72,16 @@ module.exports = function (grunt) {
         src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
         dest: 'dist/evo.min.js'
       },
+      services: {
+        src: ['<banner:meta.banner>', 'src/services/modules/**/*.js'],
+        dest: 'dist/evo.services.min.js'
+      },
+      ejs: {
+        src: ['<banner:meta.banner>', 'src/services/modules/ejs/ejs.js'],
+        dest: 'dist/evo.graphing.pie.min.js'
+      },
       graphing: {
-        src: ['<banner:meta.banner>', '<config:concat.dist.dest>'],
+        src: ['<banner:meta.banner>', 'src/graphing/modules/**/*.js'],
         dest: 'dist/evo.graphing.min.js'
       },
       pie: {
