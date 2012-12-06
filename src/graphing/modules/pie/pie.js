@@ -71,36 +71,38 @@ angular.module('evo.graphing')
                  * This will get called whenever our data attribute changes.
                  */
                 scope.$watch('data', function(data) {
-                    
-                    data = data.terms || [];
-                    svg.selectAll('*').remove();
+                   
+                    if (data) { 
+                        data = data.terms || [];
+                        svg.selectAll('*').remove();
 
-                    var g = svg.selectAll('.arc')
-                        .data(pie(data))
-                        .enter()
-                            .append('g')
-                                .attr('class', 'arc')
-                                .on('mousedown', function(d) {
-                                    scope.$apply(function() {
-                                        (scope.onClick || angular.noop)(attrs.field, d.data.term);
+                        var g = svg.selectAll('.arc')
+                            .data(pie(data))
+                            .enter()
+                                .append('g')
+                                    .attr('class', 'arc')
+                                    .on('mousedown', function(d) {
+                                        scope.$apply(function() {
+                                            (scope.onClick || angular.noop)(attrs.field, d.data.term);
+                                        });
                                     });
+
+                            g.append('path')
+                                .attr('d', arc)
+                                .style('fill', function(d) {
+                                    return color(d.data.term); 
                                 });
 
-                        g.append('path')
-                            .attr('d', arc)
-                            .style('fill', function(d) {
-                                return color(d.data.term); 
-                            });
-
-                        g.append('text')
-                            .attr('transform', function(d) { return 'translate(' + arc.centroid(d) + ')'; })
-                            .attr('dy', '.55em')
-                            .style('text-anchor', 'middle')
-                            .attr('fill', fontColor)
-                            .attr('font-size', fontSize)
-                            .text(function(d) { 
-                                return d.data.term; 
-                            }); 
+                            g.append('text')
+                                .attr('transform', function(d) { return 'translate(' + arc.centroid(d) + ')'; })
+                                .attr('dy', '.55em')
+                                .style('text-anchor', 'middle')
+                                .attr('fill', fontColor)
+                                .attr('font-size', fontSize)
+                                .text(function(d) { 
+                                    return d.data.term; 
+                                }); 
+                    }
                 })
 
             }

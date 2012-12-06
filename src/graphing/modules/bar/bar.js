@@ -55,45 +55,47 @@ angular.module('evo.graphing')
 
                 scope.$watch('data', function(data) {
 
-                    data = data.terms || [];
-                    svg.selectAll('*').remove();
+                    if (data) {
+                        data = data.terms || [];
+                        svg.selectAll('*').remove();
 
-                    x.domain(data.map(function(d) { return d.term; }));
-                    y.domain([0, d3.max(data, function(d) { return d.count; })]);
+                        x.domain(data.map(function(d) { return d.term; }));
+                        y.domain([0, d3.max(data, function(d) { return d.count; })]);
 
-                    svg.append('g')
-                        .attr('fill', fontColor)
-                        .attr('font-size', fontSize)
-                        .attr('class', 'x axis')
-                        .attr('transform', 'translate(0,' + height + ')')
-                        .call(xAxis);
+                        svg.append('g')
+                            .attr('fill', fontColor)
+                            .attr('font-size', fontSize)
+                            .attr('class', 'x axis')
+                            .attr('transform', 'translate(0,' + height + ')')
+                            .call(xAxis);
 
-                    svg.append('g')
-                        .attr('class', 'y axis')
-                        .attr('font-size', fontSize)
-                        .attr('fill', fontColor)
-                        .call(yAxis)
-                        .append('text')
-                            .attr('transform', 'rotate(-90)')
-                            .attr('y', 6)
-                            .attr('dy', '.51em')
-                            .style('text-anchor', 'end')
-                            .text('Frequency');
+                        svg.append('g')
+                            .attr('class', 'y axis')
+                            .attr('font-size', fontSize)
+                            .attr('fill', fontColor)
+                            .call(yAxis)
+                            .append('text')
+                                .attr('transform', 'rotate(-90)')
+                                .attr('y', 6)
+                                .attr('dy', '.51em')
+                                .style('text-anchor', 'end')
+                                .text('Frequency');
 
-                    svg.selectAll('.bar')
-                        .data(data)
-                        .enter()
-                            .append('rect')
-                                .attr('fill', color)
-                                .attr('x', function(d) { return x(d.term); })
-                                .attr('width', x.rangeBand())
-                                .attr('y', function(d) { return y(d.count); })
-                                .attr('height', function(d) { return height - y(d.count); })
-                                .on('mousedown', function(d) {
+                        svg.selectAll('.bar')
+                            .data(data)
+                            .enter()
+                                .append('rect')
+                                    .attr('fill', color)
+                                    .attr('x', function(d) { return x(d.term); })
+                                    .attr('width', x.rangeBand())
+                                    .attr('y', function(d) { return y(d.count); })
+                                    .attr('height', function(d) { return height - y(d.count); })
+                                    .on('mousedown', function(d) {
                                         scope.$apply(function() {
                                         (scope.onClick || angular.noop)(attrs.field, d.term);
                                     });
                                 });
+                    }
                 })
             }
         };
