@@ -40,6 +40,7 @@ angular.module('evo.graphing')
 
                 var xAxis = d3.svg.axis()
                     .scale(x)
+                    .tickFormat(format)
                     .orient('bottom');
 
                 var yAxis = d3.svg.axis()
@@ -61,7 +62,8 @@ angular.module('evo.graphing')
 
                         svg.selectAll('*').remove();
 
-                        x.domain(data.map(function(d) { return format(new Date(d.time)); }));
+                        //x.domain(data.map(function(d) { return format(new Date(d.time)); }));
+                        x.domain(data.map(function(d) { return new Date(d.time); }));
                         y.domain([0, d3.max(data, function(d) { return d.count; })]);
 
                         svg.append('g')
