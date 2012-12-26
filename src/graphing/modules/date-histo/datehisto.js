@@ -16,13 +16,20 @@ angular.module('evo.graphing')
             },
 			link: function(scope, element, attrs) {
 
-                var margin = {top:20, right: 20, bottom: 30, left: 40};
+                var margin = {top:20, right: 20, bottom: 30, left: 50};
                 var width = scope.width || 960;
                 var height = scope.height || 500;
                 var color = attrs.color || 'steelblue';
                 var fontColor = attrs.fontColor || '#000';
                 var fontSize = scope.fontSize || 14;
-                var format = d3.time.format("%Y-%m-%d");
+                var format = d3.time.format("%m/%d");
+
+                var ff = function(d) {
+                    var xx = new Date(d);
+                    if (xx.getDay()%7 === 0) {
+                        return format(xx);
+                    } else { return ''; }
+                };
 
                 /* if no field param is set, use the facet name but normalize the case */
                 if (attrs.field == undefined) {
@@ -32,15 +39,23 @@ angular.module('evo.graphing')
                 width = width - margin.left - margin.right;
                 height = height - margin.top - margin.bottom;
 
+
+                //var x = d3.scale.linear()
+                //      .range(d3.extent(data, function(d) { return d.time; }));
+
                 var x = d3.scale.ordinal()
                     .rangeRoundBands([0, width], .1);
+
+                //var x = d3.time.scale()
+                //    .range([0, width-60]);
 
                 var y = d3.scale.linear()
                     .range([height, 0]);
 
                 var xAxis = d3.svg.axis()
                     .scale(x)
-                    .tickFormat(format)
+                    .tickFormat(ff)
+                    //.ticks(12)
                     .orient('bottom');
 
                 var yAxis = d3.svg.axis()
@@ -55,15 +70,39 @@ angular.module('evo.graphing')
                             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 
-                scope.$watch('data', function(data) {
+                scope.$watch('data', function(fdata) {
 
-                    if (data) {
-                        data = data.entries || [];
+                    if (fdata) {
+                        fdata = fdata.entries || [];
+                        
+                        var data = [];
+                        for (var i=0; i < fdata.length; i++) {
+                            data.push(fdata[i]);
+                            if (i !== fdata.length-1 && fdata[i].time + 86400001 < fdata[i+1].time) {
+                            //if (i !== fdata.length-1) {
+                                //var day = fdata[i].time + 86400001;
+                                //while (day < fdata[i+1].time) {
+                                    data.push({count:0, time:fdata[i].time + 85400001});
+                                //    day += 86400001;
+                                //    console.log(day);
+                                //}
+                            }
+                        }
+
+                        //var startTime = fdata[0].time;
+                        //for (var k=0; k < fdata.length; k++) {
+                            
+                        //}
+
+                        for (var j=0; j < data.length; j++) { 
+                            console.log(new Date(data[j].time).toString() + ":" + data[j].count);
+                        }
 
                         svg.selectAll('*').remove();
+                        //console.log(data);
 
-                        //x.domain(data.map(function(d) { return format(new Date(d.time)); }));
-                        x.domain(data.map(function(d) { return new Date(d.time); }));
+                        x.domain(data.map(function(d) { return d.time; }));
+                        //x.domain(d3.extent(data, function(d) { return d.time; }));
                         y.domain([0, d3.max(data, function(d) { return d.count; })]);
 
                         svg.append('g')
@@ -90,8 +129,18 @@ angular.module('evo.graphing')
                             .enter()
                                 .append('rect')
                                     .attr('fill', color)
-                                    .attr('x', function(d) { return x(d.time); })
+                                    //.attr('x', function(d) { return x(d.time); })
+                                    .attr('x', function (d) {
+                                        //var t = (x(d.time) * (width - (width/data.length) * 0.75));
+                                   //     console.log(d.time);
+                                   //     console.log(x(d.time));
+                                        return x(new Date(d.time));
+                                    })
                                     .attr('width', x.rangeBand())
+                                    //.attr('width', (width/data.length) * .75)
+                                    //.attr('width', function(d) {
+                                    //    return (width/data.length) * 0.50;
+                                    //})
                                     .attr('y', function(d) { return y(d.count); })
                                     .attr('height', function(d) { return height - y(d.count); })
                                     .on('mousedown', function(d) {
