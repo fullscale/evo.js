@@ -25,6 +25,7 @@ angular.module('evo.graphing')
                 var format = d3.time.format('%m/%d');
                 var interpolate = attrs.interpolate || 'false';
                 var label = attrs.label || 'Frequency';
+                var dataPoints = attrs.plot || 'true';
 
 				width = width - margin.left - margin.right;
 				height = height - margin.top - margin.bottom;
@@ -44,12 +45,10 @@ angular.module('evo.graphing')
 					.orient('left');
 
                 var line = d3.svg.line()
-	                //.interpolate('cardinal')
                     .x(function(d) { return x(d.time); })
                     .y(function(d) { return y(d.count); });
 
 				var area = d3.svg.area()
-					//.interpolate('cardinal')
 					.x(function(d) { return x(d.time); })
 					.y0(height)
 					.y1(function(d) { return y(d.count); });
@@ -63,8 +62,6 @@ angular.module('evo.graphing')
 					.append('svg')
                         .attr('preserveAspectRatio', 'xMinYMin')
                         .attr('viewBox', '0 0 ' + (width + margin.left + margin.right) + ' ' + (height + margin.top + margin.bottom))
-						//.attr('width', width + margin.left + margin.right)
-						//.attr('height', height + margin.top + margin.bottom)
 						.append('g')
 							.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -111,19 +108,22 @@ angular.module('evo.graphing')
                             .attr('stroke-width', 3.5)
 	                        .attr("d", line);
 
-	                    svg.selectAll(".dot")
-	                        .data(data.filter(function(d) { return d.count; }))
-	                        .enter()
-                                .append("circle")
-                                    .attr('fill', '#058dc7')
-	                                .attr("cx", line.x())
-	                                .attr("cy", line.y())
-	                                .attr("r", 5.5)
-                                    .on('mousedown', function(d) { 
-                                        scope.$apply(function() {
-                                            (scope.onClick || angular.noop)(attrs.field, d.time);
+                        if (dataPoints == 'true') {
+                            console.log(dataPoints);
+      	                    svg.selectAll(".dot")
+	                          .data(data.filter(function(d) { return d.count; }))
+	                            .enter()
+                                    .append("circle")
+                                        .attr('fill', '#058dc7')
+	                                    .attr("cx", line.x())
+	                                    .attr("cy", line.y())
+	                                    .attr("r", 5.5)
+                                        .on('mousedown', function(d) { 
+                                            scope.$apply(function() {
+                                                (scope.onClick || angular.noop)(attrs.field, d.time);
+                                            });
                                         });
-                                    });
+                        }
 
 			        }
                 })
