@@ -22,6 +22,7 @@ angular.module('evo.graphing')
                 var color = attrs.color || 'steelblue';
                 var fontColor = attrs.fontColor || '#000';
                 var fontSize = scope.fontSize || 14;
+                var label = attrs.label || 'Frequency';
 
                 /* if no field param is set, use the facet name but normalize the case */
                 if (attrs.field == undefined) {
@@ -79,7 +80,7 @@ angular.module('evo.graphing')
                                 .attr('y', 6)
                                 .attr('dy', '.51em')
                                 .style('text-anchor', 'end')
-                                .text('Frequency');
+                                .text(label);
 
                         svg.selectAll('.bar')
                             .data(data)

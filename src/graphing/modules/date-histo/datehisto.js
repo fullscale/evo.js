@@ -23,6 +23,7 @@ angular.module('evo.graphing')
                 var fontColor = attrs.fontColor || '#000';
                 var fontSize = scope.fontSize || 14;
                 var format = d3.time.format("%m/%d");
+                var label = attrs.label || 'Frequency';
 
                 var ff = function(d) {
                     var xx = new Date(d);
@@ -88,7 +89,7 @@ angular.module('evo.graphing')
                                 .attr('y', 6)
                                 .attr('dy', '.51em')
                                 .style('text-anchor', 'end')
-                                .text('Frequency');
+                                .text(label);
 
                         svg.selectAll('.bar')
                             .data(data)

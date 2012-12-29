@@ -24,6 +24,7 @@ angular.module('evo.graphing')
                 var fontSize = scope.fontSize || 14;
                 var format = d3.time.format('%m/%d');
                 var interpolate = attrs.interpolate || 'false';
+                var label = attrs.label || 'Frequency';
 
 				width = width - margin.left - margin.right;
 				height = height - margin.top - margin.bottom;
@@ -100,7 +101,7 @@ angular.module('evo.graphing')
 						        .attr('y', 6)
 						        .attr('dy', '.71em')
 						        .style('text-anchor', 'end')
-						        .text('Frequency');
+						        .text(label);
 
                         /* draw the line on top of the area */
 	                    svg.append("path")
