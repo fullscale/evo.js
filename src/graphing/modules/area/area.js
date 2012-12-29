@@ -109,7 +109,7 @@ angular.module('evo.graphing')
 	                        .attr("d", line);
 
                         if (dataPoints == 'true') {
-                            console.log(dataPoints);
+
       	                    svg.selectAll(".dot")
 	                          .data(data.filter(function(d) { return d.count; }))
 	                            .enter()
