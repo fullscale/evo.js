@@ -36,7 +36,14 @@ module.exports = function (grunt) {
           '<banner:meta.banner>',
           'src/services/modules/ejs/ejs.js'
         ],
-        dest: 'dist/ejs.min.js'
+        dest: 'dist/ejs.js'
+      },
+      donut: {
+        src: [
+          '<banner:meta.banner>',
+          'src/graphing/modules/donut/donut.js'
+        ],
+        dest: 'dist/evo.graphing.donut.js'
       },
       pie: {
         src: [
@@ -78,11 +85,15 @@ module.exports = function (grunt) {
       },
       ejs: {
         src: ['<banner:meta.banner>', 'src/services/modules/ejs/ejs.js'],
-        dest: 'dist/evo.graphing.pie.min.js'
+        dest: 'dist/ejs.min.js'
       },
       graphing: {
         src: ['<banner:meta.banner>', 'src/graphing/modules/**/*.js'],
         dest: 'dist/evo.graphing.min.js'
+      },
+      donut: {
+        src: ['<banner:meta.banner>', 'src/graphing/modules/donut/donut.js'],
+        dest: 'dist/evo.graphing.donut.min.js'
       },
       pie: {
         src: ['<banner:meta.banner>', 'src/graphing/modules/pie/pie.js'],
