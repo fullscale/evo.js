@@ -1,13 +1,17 @@
-"use strict";
-
+/*
+ * Pie Chart 
+ * Copyright (c) 2012 FullScale Labs, LLC
+ */
 angular.module('evo.graphing')
     .directive('evoPie', function() {
+        'use strict';
+
         return {
             restrict: 'E',
-            /**
-             * Sets up an isolate scope so that we don't inherent from parent.
-             */
+
+            // sets up the isolate scope so that we don't clobber parent scope
             scope: {
+                // evaluated instances (bound once at link time)
                 outerRadius: '=',
                 innerRadius: '=',
                 fontSize: '=',
@@ -16,6 +20,8 @@ angular.module('evo.graphing')
                 onClick: '=',
                 data: '='
             },
+
+            // angular directives return a link fn
             link: function(scope, element, attrs) {
 
                 /**
