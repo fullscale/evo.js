@@ -43,7 +43,7 @@ angular.module('evo.graphing')
                  * If none is found, then use built-in color pallete
                  * but see if user has defined a domain of values.
                  */
-                if (scope.colorMap != undefined) {
+                if (scope.colorMap === undefined) {
                     color = d3.scale.category20c();
                     if (scope.domain !== undefined) {
                         color.domain(scope.domain);
