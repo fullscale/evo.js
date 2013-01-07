@@ -20,7 +20,8 @@ angular.module('evo.graphing')
                 // interpolated strings (bound to scope in watch fn)
                 label:     '@',
                 field:     '@',
-                duration:  '@'
+                duration:  '@',
+                delay:     '@'
             },
 
             // angular directives return a link fn
