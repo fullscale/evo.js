@@ -54,29 +54,32 @@ angular.module('evo.graphing')
                     }
                 }
 
+                // width/height (based on giveb radius)
                 var w = (outerRadius * 3) + 30;
                 var h = outerRadius * 3;
 
+                // arc generator 
                 var arc = d3.svg.arc()
                     .outerRadius(outerRadius - 10)
                     .innerRadius(innerRadius);
 
-                /* create the function for drawing the pie */
+                // d3 utility for creating pie charts
                 var pie = d3.layout.pie()
                     .sort(null)
                     .value(function(d) { return d.count; });
 
-                /* create the root svg element */
+                // root svg element
                 var svg = d3.select(element[0])
                     .append('svg')
                         .attr('preserveAspectRatio', 'xMinYMin meet')
                         .attr('viewBox', '0 0 ' + w + ' ' + h);
 
+                // group for arcs
                 var arcs = svg.append('g')
-                                .attr('transform', 'translate(' + 
-                                    w/2 + ',' + h/2 + ') rotate(180) scale(-1, -1)');
+                    .attr('transform', 'translate(' + w/2 + ',' + h/2 + ') rotate(180) scale(-1, -1)');
 
-                var label_group = svg.append("g")
+                // group for labels
+                var labels = svg.append("g")
                     .attr("class", "label_group")
                     .attr("transform", "translate(" + (w/2) + "," + (h/2) + ")");
 
@@ -85,7 +88,7 @@ angular.module('evo.graphing')
                 // This will get called whenever our data attribute changes.
                 scope.$watch('data', function(data) {
 
-                    // handles tweeing of arcs
+                    // arc tweening
                     function arcTween(d, i) {
                         var i = d3.interpolate(this._current, d);
                         this._current = i(0);
@@ -94,7 +97,7 @@ angular.module('evo.graphing')
                         };
                     }
         
-                    // handles tweening of labels/text
+                    // label tweening
                     function textTween(d, i) {
                         var a = (this._current.startAngle + this._current.endAngle - Math.PI)/2;
                         var b = (d.startAngle + d.endAngle - Math.PI)/2;
@@ -108,7 +111,7 @@ angular.module('evo.graphing')
                         };
                     }
 
-                    // identifies the anchor point for labels
+                    // determines the anchor point of a label
                     var findAnchor = function(d) {
                         if ((d.startAngle + d.endAngle)/2 < Math.PI ) {
                             return "beginning";
@@ -119,19 +122,24 @@ angular.module('evo.graphing')
 
                     var textOffset = 14;
 
+                    // if data is not null
                     if (data) { 
-                        data = data.terms || [];
 
+                        // pull out the terms array from the facet
+                        data = data.terms || [];
+                        var pieData = pie(data);
+
+                        // calculate the sum of the counts for this facet
                         var sum = 0;
                         for (var ii=0; ii < data.length; ii++) {
                             sum += data[ii].count;
                         }
 
-                        // if the facet has values
+                        // if the sum is 0 then this facet has no valid entries (all counts were zero)
                         if (sum > 0) {
 
                             // update the arcs
-                            var path = arcs.selectAll('path').data(pie(data));
+                            var path = arcs.selectAll('path').data(pieData);
                             path.enter()
                                 .append('path') 
                                     .attr('d', arc)
@@ -143,11 +151,12 @@ angular.module('evo.graphing')
                                         });
                                     });
 
+                            // run the transition
                             path.transition().duration(750).attrTween('d', arcTween);
 
-                            // draw the label ticks
-                            var lines = label_group.selectAll('line').data(pie(data));
-                            lines.enter().append('line')
+                            // update the label ticks
+                            var ticks = labels.selectAll('line').data(pieData);
+                            ticks.enter().append('line')
                                 .attr('x1', 0)
                                 .attr('x2', 0)
                                 .attr('y1', -outerRadius-3)
@@ -155,19 +164,22 @@ angular.module('evo.graphing')
                                 .attr('stroke', 'grey')
                                 .attr('stroke-width', 2.0)
                                 .attr('transform', function(d) {
-                                    return 'rotate(' + (d.startAngle + d.endAngle)/2 * (180/Math.PI) + ')';
+                                    return 'rotate(' + (d.startAngle + d.endAngle)/2 * (180/Math.PI) + ')'; // radians to degrees
                                 })
                                 .each(function(d) {this._current = d;});
 
-                            lines.transition()
+                            // run the transition
+                            ticks.transition()
                                 .duration(750)
                                 .attr("transform", function(d) {
                                     return "rotate(" + (d.startAngle+d.endAngle)/2 * (180/Math.PI) + ")";
                             });
-                            lines.exit().remove();
 
-                            // Draw the percent labels
-                            var valueLabels = label_group.selectAll("text.value").data(pie(data))
+                            // flush old entries
+                            ticks.exit().remove();
+
+                            // update the percent labels
+                            var percentLabels = labels.selectAll("text.value").data(pieData)
                                 .attr("dy", function(d) {
                                     if ((d.startAngle + d.endAngle)/2 > Math.PI/2 && (d.startAngle + d.endAngle)/2 < Math.PI*1.5 ) {
                                         return 17;
@@ -181,7 +193,7 @@ angular.module('evo.graphing')
                                     return percentage.toFixed(1) + "%";
                                 });
 
-                            valueLabels.enter().append("text")
+                            percentLabels.enter().append("text")
                                 .attr("class", "value")
                                 .attr('font-size', 20)
                                 .attr('font-weight', 'bold')
@@ -204,11 +216,14 @@ angular.module('evo.graphing')
                                 })
                                 .each(function(d) {this._current = d;});
                            
-                            valueLabels.transition().duration(750).attrTween("transform", textTween); 
-                            valueLabels.exit().remove();
+                            // run the transition
+                            percentLabels.transition().duration(750).attrTween("transform", textTween);
 
-                            // Draw the value labels 
-                            var nameLabels = label_group.selectAll("text.units").data(pie(data))
+                            // flush old entries
+                            percentLabels.exit().remove();
+
+                            // update the value labels 
+                            var nameLabels = labels.selectAll("text.units").data(pieData)
                                 .attr("dy", function(d){
                                     if ((d.startAngle + d.endAngle)/2 > Math.PI/2 && (d.startAngle+d.endAngle)/2 < Math.PI*1.5 ) {
                                         return 36;
@@ -261,14 +276,18 @@ angular.module('evo.graphing')
                                 })
                                 .each(function(d) {this._current = d;});
 
-                                nameLabels.transition().duration(750).attrTween("transform", textTween);
-                                nameLabels.exit().remove();
+                            // run the transition
+                            nameLabels.transition().duration(750).attrTween("transform", textTween);
+    
+                            // flush old entries
+                            nameLabels.exit().remove();
 
                         } else {
+                            // if the facet had no valid entries then remove the chart
                             svg.selectAll('path').remove();
-                            label_group.selectAll('line').remove();
-                            label_group.selectAll("text.value").remove();
-                            label_group.selectAll("text.units").remove();
+                            labels.selectAll('line').remove();
+                            labels.selectAll("text.value").remove();
+                            labels.selectAll("text.units").remove();
                         }
 
                     }
