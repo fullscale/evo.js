@@ -1,50 +1,49 @@
-"use strict";
-
+/*
+ * Date Histogram 
+ * Copyright (c) 2012 FullScale Labs, LLC
+ */
 angular.module('evo.graphing')
     .directive('evoBar', function() {
+        'user strict';
+
         return {
+            // restricts this directive to being used as an element only
 			restrict: 'E',
-            /**
-             * Sets up an isolate scope so that we don't inherent from parent.
-             */
+
+            // sets up the isolate scope so that we don't clobber parent scope
             scope: {
-                fontSize: '=',
-                onClick: '=',
-                width: '=',
-                height: '=',
-                data: '='
+                // evaluated instances (bound once at link time)
+                onClick:  '=',
+                width:    '=',
+                height:   '=',
+                bind:     '=',
+                // interpolated strings (bound to scope in watch fn)
+                duration: '@'
+                
             },
 			link: function(scope, element, attrs) {
 
-                var margin = {top:20, right: 20, bottom: 30, left: 40};
-                var width = scope.width || 960;
-                var height = scope.height || 500;
-                var color = attrs.color || 'steelblue';
-                var fontColor = attrs.fontColor || '#000';
-                var fontSize = scope.fontSize || 14;
-                var label = attrs.label || 'Frequency';
+                var margin = {
+                    top: 10, 
+                    right: 10, 
+                    bottom: 10, 
+                    left: 10
+                };
 
-                /* if no field param is set, use the facet name but normalize the case */
-                if (attrs.field == undefined) {
-                    attrs.field = attrs.data.split('.').pop().toLowerCase();
-                }
-
+                var width = scope.width || 300;
+                var height = scope.height || 1020;
+                
+                // add margin
                 width = width - margin.left - margin.right;
                 height = height - margin.top - margin.bottom;
 
-                var x = d3.scale.ordinal()
-                    .rangeRoundBands([0, width], .1);
+                var klass = attrs.class || '';
 
-                var y = d3.scale.linear()
-                    .range([height, 0]);
+                var x = d3.scale.linear()
+                    .range([0, width]);
 
-                var xAxis = d3.svg.axis()
-                    .scale(x)
-                    .orient('bottom');
-
-                var yAxis = d3.svg.axis()
-                    .scale(y)
-                    .orient('left');
+                var y = d3.scale.ordinal()
+                    .rangeBands([0, height], .1);
 
                 var svg = d3.select(element[0])
                     .append('svg')
@@ -54,48 +53,60 @@ angular.module('evo.graphing')
                             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
 
-                scope.$watch('data', function(data) {
+                scope.$watch('bind', function(data) {
+
+                    // pull info from scope
+                    var duration = scope.duration || 0;
+                    var delay = scope.delay || 0;
+                    var field = scope.field || attrs.bind.split('.').pop().toLowerCase();
 
                     if (data) {
+                        console.log(duration);
+
+                        // pull the data array from the facet 
                         data = data.terms || [];
-                        svg.selectAll('*').remove();
 
-                        x.domain(data.map(function(d) { return d.term; }));
-                        y.domain([0, d3.max(data, function(d) { return d.count; })]);
+                        x.domain([0, d3.max(data, function(d) { return d.count; })*2]);
+                        y.domain(data.map(function(d) { return d.term; }));
 
-                        svg.append('g')
-                            .attr('fill', fontColor)
-                            .attr('font-size', fontSize)
-                            .attr('class', 'x axis')
-                            .attr('transform', 'translate(0,' + height + ')')
-                            .call(xAxis);
+                        // random key here?
+                        var bars = svg.selectAll('rect')
+                            .data(data, function(d) { return Math.random(); });
 
-                        svg.append('g')
-                            .attr('class', 'y axis')
-                            .attr('font-size', fontSize)
-                            .attr('fill', fontColor)
-                            .call(yAxis)
+                        // d3 enter fn binds each new value to a rect
+                        bars.enter()
+                            .append('rect')
+                                .attr('class', 'bar rect ' + klass)
+                                .attr('y', function(d) { return y(d.term); })
+                                .attr('height', y.rangeBand())
+                                .transition()
+                                    .duration(duration)
+                                        .attr('width', function(d) { return x(d.count); });
+
+                        // wire up event listeners - (registers filter callback)
+                        bars.on('mousedown', function(d) {
+                            scope.$apply(function() {
+                                (scope.onClick || angular.noop)(field, d.term);
+                            });
+                        });
+
+                        // d3 exit/remove flushes old values (removes old rects)
+                        bars.exit().remove();
+
+                        var labels = svg.selectAll("text")
+                            .data(data, function(d) { return Math.random(); });
+
+                        labels.enter()
                             .append('text')
-                                .attr('transform', 'rotate(-90)')
-                                .attr('y', 6)
-                                .attr('dy', '.51em')
-                                .style('text-anchor', 'end')
-                                .text(label);
+                                .attr('class', 'bar text ' + klass)
+                                .attr('y', function(d) { return y(d.term) + y.rangeBand() / 2; })
+                                .attr('dx', function(d) { return x(d.count) + 3}) // padding-right
+                                .attr('dy', '.35em') // vertical-align: middle
+                                .attr('text-anchor', 'start') // text-align: right
+                                .text(function(d) { return d.term + ' (' + d.count + ')' });
 
-                        svg.selectAll('.bar')
-                            .data(data)
-                            .enter()
-                                .append('rect')
-                                    .attr('fill', color)
-                                    .attr('x', function(d) { return x(d.term); })
-                                    .attr('width', x.rangeBand())
-                                    .attr('y', function(d) { return y(d.count); })
-                                    .attr('height', function(d) { return height - y(d.count); })
-                                    .on('mousedown', function(d) {
-                                        scope.$apply(function() {
-                                        (scope.onClick || angular.noop)(attrs.field, d.term);
-                                    });
-                                });
+                        // d3 exit/remove flushes old values (removes old rects)
+                        labels.exit().remove();
                     }
                 })
             }
