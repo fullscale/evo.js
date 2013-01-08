@@ -143,6 +143,8 @@ angular.module('evo.graphing')
                             path.enter()
                                 .append('path') 
                                     .attr('d', arc)
+                                    .attr('stroke', '#fff')
+                                    .attr('stroke-width', '2.5')
                                     .style('fill', function(d) { return color(d.data.term); })
                                     .each(function(d) { this._current = d; })
                                     .on('mousedown', function(d) {
