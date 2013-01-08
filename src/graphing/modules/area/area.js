@@ -33,7 +33,7 @@ angular.module('evo.graphing')
                     top: 20, 
                     right: 20, 
                     bottom: 30, 
-                    left: 50
+                    left: 80
                 };
 
                 // default width/height - mainly to create aspect ratio since svg scales dynamically
