@@ -19,7 +19,6 @@ angular.module('evo.graphing')
                 bind:     '=',
                 // interpolated strings (bound to scope in watch fn)
                 duration: '@'
-                
             },
 			link: function(scope, element, attrs) {
 
@@ -38,6 +37,9 @@ angular.module('evo.graphing')
                 height = height - margin.top - margin.bottom;
 
                 var klass = attrs.class || '';
+                var align = attrs.align || 'left';
+
+                var viewAlign = align === 'right' ? 'xMaxYMin' : 'xMinYMin';
 
                 var x = d3.scale.linear()
                     .range([0, width]);
@@ -47,7 +49,7 @@ angular.module('evo.graphing')
 
                 var svg = d3.select(element[0])
                     .append('svg')
-                        .attr('preserveAspectRatio', 'xMinYMin meet')
+                        .attr('preserveAspectRatio', viewAlign + ' meet')
                         .attr('viewBox', '0 0 ' + (width + margin.left + margin.right) + ' ' + (height + margin.top + margin.bottom))
                         .append('g')
                             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
@@ -61,7 +63,6 @@ angular.module('evo.graphing')
                     var field = scope.field || attrs.bind.split('.').pop().toLowerCase();
 
                     if (data) {
-                        console.log(duration);
 
                         // pull the data array from the facet 
                         data = data.terms || [];
@@ -79,9 +80,23 @@ angular.module('evo.graphing')
                                 .attr('class', 'bar rect ' + klass)
                                 .attr('y', function(d) { return y(d.term); })
                                 .attr('height', y.rangeBand())
+                                .attr('x', function(d) { 
+                                    if (align === 'right') {
+                                        return width;
+                                    } else {
+                                        return 0; 
+                                    }
+                                }) // added
                                 .transition()
                                     .duration(duration)
-                                        .attr('width', function(d) { return x(d.count); });
+                                        .attr('width', function(d) { return x(d.count); })
+                                        .attr('x', function(d) { 
+                                            if (align === 'right') {
+                                                return width - x(d.count);
+                                            } else {
+                                                return 0;
+                                            }
+                                        });
 
                         // wire up event listeners - (registers filter callback)
                         bars.on('mousedown', function(d) {
@@ -100,10 +115,28 @@ angular.module('evo.graphing')
                             .append('text')
                                 .attr('class', 'bar text ' + klass)
                                 .attr('y', function(d) { return y(d.term) + y.rangeBand() / 2; })
-                                .attr('dx', function(d) { return x(d.count) + 3}) // padding-right
+                                .attr('dx', function(d) { 
+                                    if (align === 'right') {
+                                        return width - x(d.count) - 3;
+                                    } else {
+                                        return x(d.count) + 3;
+                                    }
+                                }) // padding-right
                                 .attr('dy', '.35em') // vertical-align: middle
-                                .attr('text-anchor', 'start') // text-align: right
-                                .text(function(d) { return d.term + ' (' + d.count + ')' });
+                                .attr('text-anchor', function(d) {
+                                    if (align === 'right') {
+                                        return 'end';
+                                    } else {
+                                        return 'start';
+                                    }
+                                }) // text-align: right
+                                .text(function(d) { 
+                                    if (align === 'right') {
+                                        return '(' + d.count + ') ' + d.term;
+                                    } else {
+                                        return d.term + ' (' + d.count + ')';
+                                    }
+                                });
 
                         // d3 exit/remove flushes old values (removes old rects)
                         labels.exit().remove();
