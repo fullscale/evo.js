@@ -59,6 +59,13 @@ module.exports = function (grunt) {
         ],
         dest: 'dist/evo.graphing.bar.js'
       },
+      column: {
+        src: [
+          '<banner:meta.banner>',
+          'src/graphing/modules/column/column.js'
+        ],
+        dest: 'dist/evo.graphing.column.js'
+      },
       area: {
         src: [
           '<banner:meta.banner>',
@@ -102,6 +109,10 @@ module.exports = function (grunt) {
       bar: {
         src: ['<banner:meta.banner>', 'src/graphing/modules/bar/bar.js'],
         dest: 'dist/evo.graphing.bar.min.js'
+      },
+      column: {
+        src: ['<banner:meta.banner>', 'src/graphing/modules/column/column.js'],
+        dest: 'dist/evo.graphing.column.min.js'
       },
       area: {
         src: ['<banner:meta.banner>', 'src/graphing/modules/area/area.js'],
