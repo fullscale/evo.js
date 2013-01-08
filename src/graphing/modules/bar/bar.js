@@ -115,7 +115,7 @@ angular.module('evo.graphing')
                             .append('text')
                                 .attr('class', 'bar text ' + klass)
                                 .attr('y', function(d) { return y(d.term) + y.rangeBand() / 2; })
-                                .attr('dx', function(d) { 
+                                .attr('x', function(d) { 
                                     if (align === 'right') {
                                         return width - x(d.count) - 3;
                                     } else {
