@@ -128,7 +128,7 @@ angular.module('evo.graphing')
                     var duration = scope.duration || 0;
                     var delay = scope.delay || 0;
                     var dataPoints = scope.plot || 'true';
-                    var pointRadius = scope.pointRadius || 6;
+                    var pointRadius = scope.pointRadius || 8;
                     var field = scope.field || attrs.data.split('.').pop().toLowerCase();
 
                     // just because scope is bound doesn't imply we have data.
