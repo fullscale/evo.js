@@ -78,6 +78,7 @@ angular.module('evo.graphing')
                         bars.enter()
                             .append('rect')
                                 .attr('class', 'bar rect ' + klass)
+                                .attr('cursor', 'pointer')
                                 .attr('y', function(d) { return y(d.term); })
                                 .attr('height', y.rangeBand())
                                 .attr('x', function(d) { 
@@ -114,6 +115,7 @@ angular.module('evo.graphing')
                         labels.enter()
                             .append('text')
                                 .attr('class', 'bar text ' + klass)
+                                .attr('cursor', 'pointer')
                                 .attr('y', function(d) { return y(d.term) + y.rangeBand() / 2; })
                                 .attr('x', function(d) { 
                                     if (align === 'right') {
@@ -130,6 +132,7 @@ angular.module('evo.graphing')
                                         return 'start';
                                     }
                                 }) // text-align: right
+
                                 .text(function(d) { 
                                     if (align === 'right') {
                                         return '(' + d.count + ') ' + d.term;

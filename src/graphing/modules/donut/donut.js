@@ -145,6 +145,7 @@ angular.module('evo.graphing')
                                     .attr('d', arc)
                                     .attr('stroke', '#fff')
                                     .attr('stroke-width', '1.5')
+                                    .attr('cursor', 'pointer')
                                     .style('fill', function(d) { return color(d.data.term); })
                                     .each(function(d) { this._current = d; })
                                     .on('mousedown', function(d) {
