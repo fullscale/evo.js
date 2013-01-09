@@ -138,6 +138,13 @@ angular.module('evo.graphing')
                                     }
                                 });
 
+                        // wire up event listeners - (registers filter callback)
+                        labels.on('mousedown', function(d) {
+                            scope.$apply(function() {
+                                (scope.onClick || angular.noop)(field, d.term);
+                            });
+                        });
+
                         // d3 exit/remove flushes old values (removes old rects)
                         labels.exit().remove();
                     }
