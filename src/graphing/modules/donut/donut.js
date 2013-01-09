@@ -242,11 +242,11 @@ angular.module('evo.graphing')
                                     }
                                 }).text(function(d) {
                                     if (d.data.term === 'T') {
-                                        return 'TRUE';
+                                        return 'TRUE' + ' (' + d.value + ')';
                                     } else if (d.data.term === 'F') {
-                                        return 'FALSE';
+                                        return 'FALSE'+ ' (' + d.value + ')';
                                     } else {
-                                        return d.data.term;
+                                        return d.data.term + ' (' + d.value + ')';
                                     }
                                 });
 
@@ -270,11 +270,11 @@ angular.module('evo.graphing')
                                 .attr('text-anchor', findAnchor)
                                 .text(function(d){
                                     if (d.data.term === 'T') {
-                                        return 'TRUE';
+                                        return 'TRUE' + ' (' + d.value + ')';
                                     } else if (d.data.term === 'F') {
-                                        return 'FALSE';
+                                        return 'FALSE' + ' (' + d.value + ')';
                                     } else {
-                                        return d.data.term;
+                                        return d.data.term + ' (' + d.value + ')';
                                     }
                                 })
                                 .each(function(d) {this._current = d;});
